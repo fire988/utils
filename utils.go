@@ -1,15 +1,18 @@
 package utils
 
 import (
+	"bytes"
 	"crypto/md5"
 	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"math/rand"
 	"net/http"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/lunny/log"
 )
@@ -281,4 +284,52 @@ func JSONSort(jsonStr string) string {
 		return jsonStr
 	}
 	return string(buf)
+}
+
+//IsNotExist --
+func IsNotExist(err error) bool {
+	str := err.Error()
+
+	if strings.Contains(str, "not found") {
+		return true
+	}
+
+	if strings.Contains(str, "not exist") {
+		return true
+	}
+	return false
+}
+
+const charTbl = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ00112233445566778899"
+
+var rnd *rand.Rand
+
+//GenRandomPass --
+func GenRandomPass(length int) string {
+
+	buf := bytes.Buffer{}
+	tblLength := len(charTbl)
+	for i := 0; i < length; i++ {
+		buf.WriteByte(charTbl[rnd.Intn(tblLength)])
+	}
+
+	return buf.String()
+}
+
+const digiTbl = "0123456789"
+
+//GenRandomDigiCode -- 生成全数字的串，一般是做验证码用
+func GenRandomDigiCode(length int) string {
+
+	buf := bytes.Buffer{}
+	tblLength := len(digiTbl)
+	for i := 0; i < length; i++ {
+		buf.WriteByte(digiTbl[rnd.Intn(tblLength)])
+	}
+
+	return buf.String()
+}
+
+func init() {
+	rnd = rand.New(rand.NewSource(time.Now().UnixNano()))
 }
