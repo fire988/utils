@@ -35,3 +35,12 @@ func TestDigiCode(t *testing.T) {
 		fmt.Println(s)
 	}
 }
+
+func TestPersonID(t *testing.T) {
+	if IsValidPersonID("330107216911255451") {
+		t.Error("error checking 330107216911255451")
+	}
+	if IsValidPersonID("290121186901020824") {
+		t.Error("error checking 290121186901020824")
+	}
+}
