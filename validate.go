@@ -1,7 +1,12 @@
 package utils
 
 import (
+	"io/ioutil"
+	"log"
 	"strconv"
+	"strings"
+
+	"github.com/saintfish/chardet"
 )
 
 var wi = [...]int{7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2}
@@ -51,4 +56,38 @@ func IsValidPersonID(idStr string) bool {
 	}
 
 	return tb2[idx] == ch
+}
+
+//IsValidEmail --
+func IsValidEmail(mail string) bool {
+	s := strings.Split(mail, "@")
+	if len(s) != 2 {
+		return false
+	}
+	if strings.Contains(s[1], ".") == false {
+		return false
+	}
+
+	return true
+}
+
+//IsUtf8File --
+func IsUtf8File(file string) bool {
+	buf, err := ioutil.ReadFile(file)
+	if err != nil {
+		log.Println("open file error:", err.Error())
+		return false
+	}
+	detector := chardet.NewTextDetector()
+	result, err := detector.DetectBest(buf)
+	if err != nil {
+		log.Println("detect error:", err.Error())
+		return false
+	}
+
+	if result.Charset == "UTF-8" && result.Confidence > 50 {
+		return true
+	}
+
+	return false
 }

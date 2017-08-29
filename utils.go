@@ -286,19 +286,21 @@ func JSONSort(jsonStr string) string {
 	return string(buf)
 }
 
-//IsNotExist --
+//IsNotExist windows下的os.IsNotExist有问题，不能识别"not found"
 func IsNotExist(err error) bool {
-	str := err.Error()
-
-	if strings.Contains(str, "not found") {
+	if os.IsNotExist(err) {
+		return true
+	}
+	if strings.Contains(err.Error(), "not found") {
+		return true
+	}
+	if strings.Contains(err.Error(), "does not exist") {
 		return true
 	}
 
-	if strings.Contains(str, "not exist") {
-		return true
-	}
 	return false
 }
+
 
 const charTbl = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ00112233445566778899"
 
