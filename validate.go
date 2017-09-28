@@ -78,6 +78,18 @@ func IsUtf8File(file string) bool {
 		log.Println("open file error:", err.Error())
 		return false
 	}
+
+	hasUnprintableChars := false
+	for _, c := range buf {
+		if c > 127 {
+			hasUnprintableChars = true
+			break
+		}
+	}
+
+	if !hasUnprintableChars {
+		return true
+	}
 	detector := chardet.NewTextDetector()
 	result, err := detector.DetectBest(buf)
 	if err != nil {
