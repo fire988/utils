@@ -44,3 +44,11 @@ func TestPersonID(t *testing.T) {
 		t.Error("error checking 290121186901020824")
 	}
 }
+
+func TestStringDisorder(t *testing.T) {
+	r := StringDisorder("0123456789")
+	if len(r) != len("0123456789") {
+		t.Error("error 01")
+	}
+	t.Log(r)
+}

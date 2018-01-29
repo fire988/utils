@@ -332,6 +332,21 @@ func GenRandomDigiCode(length int) string {
 	return buf.String()
 }
 
+//StringDisorder -- 将输入字符串乱序后返回
+func StringDisorder(src string) string {
+	rand.Seed(time.Now().UnixNano())
+
+	tmp := src[:]
+
+	result := []byte("")
+	for i := len(src); i > 0; i-- {
+		r := rand.Intn(i)
+		result = append(result, tmp[r])
+		tmp = tmp[0:r] + tmp[r+1:]
+	}
+	return string(result)
+}
+
 func init() {
 	rnd = rand.New(rand.NewSource(time.Now().UnixNano()))
 }

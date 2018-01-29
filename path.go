@@ -21,4 +21,3 @@ func Dir(path string) string {
 
 	return path[:pos+1]
 }
-
