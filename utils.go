@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"math/rand"
 	"net/http"
@@ -14,8 +15,16 @@ import (
 	"strings"
 	"time"
 
+	"github.com/alexmullins/zip"
+
 	"github.com/lunny/log"
 )
+
+//FilesToZip --
+type FilesToZip struct {
+	Name    string
+	Content []byte
+}
 
 //DispHex 十六进制显示数据
 func DispHex(msg string, buf []byte) {
@@ -76,6 +85,61 @@ func WriteToFile(buf []byte, filename string) error {
 		return err
 	}
 	fo.Write(buf)
+	fo.Close()
+	return nil
+}
+
+//Zip 打包zip文件，带password
+func Zip(zipfilename, password string, files []FilesToZip) error {
+	// 创建一个缓冲区用来保存压缩文件内容
+	raw := new(bytes.Buffer)
+
+	// 创建一个压缩文档
+	zipw := zip.NewWriter(raw)
+
+	for _, file := range files {
+		w, err := zipw.Encrypt(file.Name, password)
+
+		if err != nil {
+			log.Debug("error 1:%s", err.Error())
+			return err
+		}
+		_, err = io.Copy(w, bytes.NewReader(file.Content))
+		if err != nil {
+			log.Debug("error 2:%s", err.Error())
+			return err
+		}
+	}
+
+	zipw.Close()
+
+	// 将压缩文档内容写入文件
+	f, err := os.OpenFile(zipfilename, os.O_CREATE|os.O_WRONLY, 0666)
+	if err != nil {
+		log.Debug("error 3:%s", err.Error())
+		return nil
+	}
+	raw.WriteTo(f)
+	f.Close()
+
+	return nil
+}
+
+//WriteStringArrayToFile 写string array到一个数组里
+func WriteStringArrayToFile(arr []string, filename string) error {
+	fo, err := os.Create(filename)
+
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+
+	var buffer bytes.Buffer
+
+	for i := 0; i < len(arr); i++ {
+		buffer.WriteString(arr[i] + "\n")
+	}
+	fo.Write(buffer.Bytes())
 	fo.Close()
 	return nil
 }
@@ -300,7 +364,6 @@ func IsNotExist(err error) bool {
 
 	return false
 }
-
 
 const charTbl = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ00112233445566778899"
 
