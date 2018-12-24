@@ -98,7 +98,13 @@ func Zip(zipfilename, password string, files []FilesToZip) error {
 	zipw := zip.NewWriter(raw)
 
 	for _, file := range files {
-		w, err := zipw.Encrypt(file.Name, password)
+		var w io.Writer
+		var err error
+		if password == "" {
+			w, err = zipw.Create(file.Name)
+		} else {
+			w, err = zipw.Encrypt(file.Name, password)
+		}
 
 		if err != nil {
 			log.Debug("error 1:%s", err.Error())

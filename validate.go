@@ -58,6 +58,33 @@ func IsValidPersonID(idStr string) bool {
 	return tb2[idx] == ch
 }
 
+//IsValidOldPersonID -- 检验身份证合法性(15位老身份证)
+func IsValidOldPersonID(idStr string) bool {
+
+	if len(idStr) != 15 {
+		return false
+	}
+
+	for i := 0; i < len(idStr); i++ {
+		if idStr[i] < '0' || idStr[i] > '9' {
+			return false
+		}
+	}
+
+	switch idStr[8:10] {
+	case "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12":
+	default:
+		return false
+	}
+
+	d, _ := strconv.Atoi(idStr[8:10])
+
+	if d < 1 || d > 31 {
+		return false
+	}
+	return true
+}
+
 //IsValidEmail --
 func IsValidEmail(mail string) bool {
 	s := strings.Split(mail, "@")
