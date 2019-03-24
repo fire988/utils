@@ -12,6 +12,7 @@ import (
 	"math/rand"
 	"net/http"
 	"os"
+	"path"
 	"strings"
 	"time"
 
@@ -154,6 +155,16 @@ func WriteStringArrayToFile(arr []string, filename string) error {
 func IsHexStr(str string) bool {
 	for i := 0; i < len(str); i++ {
 		if !(str[i] >= '0' && str[i] <= '9' || str[i] >= 'a' && str[i] <= 'f' || str[i] >= 'A' && str[i] <= 'F') {
+			return false
+		}
+	}
+	return true
+}
+
+//IsDigiStr 判定一个字符串是不是由数字字符组成
+func IsDigiStr(str string) bool {
+	for i := 0; i < len(str); i++ {
+		if !(str[i] >= '0' && str[i] <= '9') {
 			return false
 		}
 	}
@@ -414,6 +425,13 @@ func StringDisorder(src string) string {
 		tmp = tmp[0:r] + tmp[r+1:]
 	}
 	return string(result)
+}
+
+//CreateFullDir -- 根据一个文件路径，创建其所在目录
+func CreateFullDir(file string) error {
+	dir := path.Dir(file)
+	os.MkdirAll(dir, 0777)
+	return nil
 }
 
 func init() {
