@@ -375,6 +375,9 @@ func IsNotExist(err error) bool {
 	if strings.Contains(err.Error(), "not found") {
 		return true
 	}
+	if strings.Contains(err.Error(), "cannot find") {
+		return true
+	}
 	if strings.Contains(err.Error(), "does not exist") {
 		return true
 	}
