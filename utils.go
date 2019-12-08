@@ -199,6 +199,37 @@ func ReadToArrayAndTrim(file string) ([]string, error) {
 	return r, nil
 }
 
+func removeComment(t string) string {
+	if len(t) < 2 {
+		return t
+	}
+
+	pos := strings.Index(t, "//")
+	if pos == -1 {
+		return t
+	}
+	return t[:pos]
+}
+
+//ReadToArrayAndRemoveComment 读文本文件到一个string array里，每个string已经去掉了'\r','\n'字符
+//并且去掉了空行和注释（注释以//开头）
+func ReadToArrayAndRemoveComment(file string) ([]string, error) {
+	buf, err := ioutil.ReadFile(file)
+	if err != nil {
+		return []string{}, err
+	}
+	strs := strings.Split(string(buf), "\n")
+	r := []string{}
+	for _, v := range strs {
+		t := strings.TrimSpace(v)
+		t = removeComment(t)
+		if t != "" {
+			r = append(r, t)
+		}
+	}
+	return r, nil
+}
+
 //IsLocalIP 判断是不是本地IP
 func IsLocalIP(IP string) bool {
 	pos := strings.LastIndex(IP, ":")
@@ -435,6 +466,16 @@ func CreateFullDir(file string) error {
 	dir := path.Dir(file)
 	os.MkdirAll(dir, 0777)
 	return nil
+}
+
+//IsWorkDay --
+func IsWorkDay(t time.Time) bool {
+	return true
+}
+
+//AddByWorkDay --
+func AddByWorkDay(start time.Time, days int) time.Time {
+	return time.Now()
 }
 
 func init() {
