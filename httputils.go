@@ -6,21 +6,15 @@ import (
 	"net/http"
 )
 
-//MultiPartFile --
-type MultiPartFile struct {
-	FileName string
-	FileData []byte
-}
-
 //MultiPart --
 type MultiPart struct {
-	Files []MultiPartFile
+	Files map[string][]byte
 	Forms map[string]string
 }
 
 //GetMultiParts --
 func GetMultiParts(r *http.Request) (MultiPart, error) {
-	mp := MultiPart{Files: []MultiPartFile{}, Forms: map[string]string{}}
+	mp := MultiPart{Files: map[string][]byte{}, Forms: map[string]string{}}
 
 	mr, err := r.MultipartReader()
 	if err != nil {
@@ -45,7 +39,7 @@ func GetMultiParts(r *http.Request) (MultiPart, error) {
 		}
 		if fileName != "" {
 			fileData, _ := ioutil.ReadAll(p)
-			mp.Files = append(mp.Files, MultiPartFile{FileName: fileName, FileData: fileData})
+			mp.Files[fileName] = fileData
 		}
 	}
 }

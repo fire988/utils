@@ -464,8 +464,7 @@ func StringDisorder(src string) string {
 //CreateFullDir -- 根据一个文件路径，创建其所在目录
 func CreateFullDir(file string) error {
 	dir := path.Dir(file)
-	os.MkdirAll(dir, 0777)
-	return nil
+	return os.MkdirAll(dir, 0777)
 }
 
 //IsWorkDay --
