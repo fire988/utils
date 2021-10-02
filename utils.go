@@ -477,6 +477,102 @@ func AddByWorkDay(start time.Time, days int) time.Time {
 	return time.Now()
 }
 
+func isSpaceChar(ch byte) bool {
+	if ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r' {
+		return true
+	}
+	return false
+}
+
+//TrimAllSpace -- 去掉前后空格以及\t,\r,\n，并且将中间出现的多个空格合并
+func TrimAllSpace(ss string) string {
+	inStr := false
+	inSpace := false
+
+	s := strings.TrimLeft(ss, " \t\n\r")
+	s = strings.TrimRight(s, " \t\n\r")
+	result := ""
+	for i := 0; i < len(s); i++ {
+		if inStr {
+			result = result + string(s[i])
+			if s[i] == '"' {
+				inStr = false
+				continue
+			}
+		} else {
+			if s[i] == '"' {
+				result = result + string(s[i])
+				inStr = true
+				if inSpace {
+					inSpace = false
+				}
+				continue
+			}
+			if !inSpace {
+				if isSpaceChar(s[i]) {
+					inSpace = true
+					result = result + " "
+					continue
+				}
+				result = result + string(s[i])
+			} else {
+				if !isSpaceChar(s[i]) {
+					result = result + string(s[i])
+					inSpace = false
+				}
+			}
+		}
+	}
+
+	return result
+}
+
+func getNext(all, sep string) (r string, next int) {
+	if len(all) < len(sep) {
+		return all, -1
+	}
+
+	quot := all[0]
+	if quot == '"' || quot == '\'' {
+		t := strings.IndexByte(all[1:], quot)
+		if t >= 0 {
+			return all[1 : t+1], t + 2 + len(sep)
+		}
+	}
+
+	pos := strings.Index(all, sep)
+	if pos == 0 {
+		return "", len(sep)
+	}
+
+	if pos == -1 {
+		return all, -1
+	}
+	return all[:pos], pos + len(sep)
+}
+
+//SplitString -- 支持引号字符串
+func SplitString(all, sep string) (r []string) {
+	defer func() {
+		if r := recover(); r != nil {
+		}
+	}()
+
+	if len(sep) > len(all) {
+		return []string{}
+	}
+
+	i := 0
+	for {
+		s, pos := getNext(all[i:], sep)
+		r = append(r, s)
+		if pos == -1 {
+			return
+		}
+		i += pos
+	}
+}
+
 func init() {
 	rnd = rand.New(rand.NewSource(time.Now().UnixNano()))
 }
